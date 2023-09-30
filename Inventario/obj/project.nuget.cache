@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "Lra7Ae50i1GlBKzyzHThJ6/VLpegBY+0D4bnfrd/Czhf2Wy+WYrMTEGwZRRvgjHiubYqav5nPOTQ/Rf5H+0dkQ==",
+  "dgSpecHash": "TjqKX+LJJhi5HzgN1O8AZOo9T5PvAoT5pi0M8HjNulzvUDU/H7mBoz1Q3O+ZFwGnMXNQDvE5il422FJ3z16SRQ==",
   "success": true,
   "projectFilePath": "C:\\inventario\\Inventario\\Inventario\\Inventario.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\jpave\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\jpave\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\jpave\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\jpave\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
     "C:\\Users\\jpave\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

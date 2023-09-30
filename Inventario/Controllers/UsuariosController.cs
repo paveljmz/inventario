@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Inventario.Modelos;
 using Inventario.Modelos.Vistas;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace Inventario.Controllers
 {
@@ -14,26 +15,29 @@ namespace Inventario.Controllers
     {
         private readonly ILogger<UsuariosController> _logger;
         private readonly ApplicationDbContext _db;
-        public UsuariosController(ILogger<UsuariosController> logger, ApplicationDbContext db)
+        private readonly IMapper _mapper;
+        public  UsuariosController(ILogger<UsuariosController> logger, ApplicationDbContext db, IMapper mapper)
         {
             _logger = logger;
             _db = db;
+            _mapper = mapper;   
         }
 
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<Usuario>> GetUsuarios()
+        public async Task <ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
             _logger.LogInformation("obtener los usuarios");
-            return Ok(_db.Usuarios);
+            IEnumerable<Usuario> usuarioList = await _db.Usuarios.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<VistaUsuario>>(usuarioList));
         }
 
         [HttpGet("id:int", Name = "GetUsuario")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<VistaUsuario> GetUsuario(int id)
+        public async Task<ActionResult<VistaUsuario>> GetUsuario(int id)
         {
             if (id == 0)
             {
@@ -42,13 +46,13 @@ namespace Inventario.Controllers
 
             }
             //var villa = _db.villas.FirstOrDefault(v => v.Id == id);
-            var usuario = _db.Usuarios.FirstOrDefault(v => v.IdUsuario == id);
+            var usuario =await  _db.Usuarios.FirstOrDefaultAsync(v => v.IdUsuario == id);
 
             if (usuario == null)
             {
                 return NotFound();
             }
-            return Ok(usuario);
+            return Ok(_mapper.Map<VistaUsuario>(usuario));
 
         }
         [HttpPost]
@@ -56,117 +60,83 @@ namespace Inventario.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public ActionResult<VistaUsuario> CrearUsuario([FromBody] VistaUsuario vistaUsuario)
+        public async Task<ActionResult<VistaUsuario>> CrearUsuario([FromBody] CreateUsuario createUsuario)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (_db.Usuarios.FirstOrDefault(v => v.NombreUsuario.ToLower() == vistaUsuario.NombreUsuario.ToLower()) != null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
+            if (await _db.Usuarios.FirstOrDefaultAsync(v => v.NombreUsuario.ToLower() == createUsuario.NombreUsuario.ToLower()) != null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
             {
                 ModelState.AddModelError("EL NOMBRE YA EXISTE", " UN USUARIO  CON ESE NOMBRE YA EXISTE");
                 return BadRequest(ModelState);
             }
-            if (vistaUsuario == null)
+            if (createUsuario == null)
             {
-                return BadRequest(vistaUsuario);
+                return BadRequest(createUsuario);
             }
-            if (vistaUsuario.IdUsuario> 0)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            Usuario modelo = new()
-            {
-                IdUsuario = vistaUsuario.IdUsuario,
-                NombreUsuario = vistaUsuario.NombreUsuario,
-                CorreoUsuario = vistaUsuario.CorreoUsuario,
-                TipoUsuario = vistaUsuario.TipoUsuario,
-                Area = vistaUsuario.Area,
-                PasswordUsuario = vistaUsuario.PasswordUsuario
-
-            };
-            _db.Usuarios.Add(modelo);//insert en bd
-            _db.SaveChanges();
-            return CreatedAtRoute("GetUsuario", new { id = vistaUsuario.IdUsuario }, vistaUsuario);
+            Usuario modelo = _mapper.Map<Usuario>(createUsuario);
+            await _db.Usuarios.AddAsync(modelo);//insert en bd
+            await _db.SaveChangesAsync();
+            return CreatedAtRoute("GetUsuario", new { id = modelo.IdUsuario },modelo);
         }
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult DeleteUsuario(int id)
+        public async Task<IActionResult >DeleteUsuario(int id)
         {
             if (id == 0)
             {
                 return BadRequest();
             }
-            var usuario = _db.Usuarios.FirstOrDefault(v => v.IdUsuario == id);
+            var usuario =await  _db.Usuarios.FirstOrDefaultAsync(v => v.IdUsuario == id);
             if (usuario == null) { return NotFound(); }
             _db.Usuarios.Remove(usuario);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return NoContent();
 
         }
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult UpdateUsuario(int id, [FromBody] VistaUsuario vistaUsuario)
+        public async Task<IActionResult> UpdateUsuario(int id, [FromBody] UpdateUsuario updateUsuario)
         {
-            if (vistaUsuario == null || id != vistaUsuario.IdUsuario)
+            if (updateUsuario == null || id != updateUsuario.IdUsuario)
             { return BadRequest(); }
-            
-            Usuario modelo = new()
-            {
-                IdUsuario = vistaUsuario.IdUsuario,
-                NombreUsuario = vistaUsuario.NombreUsuario,
-                CorreoUsuario = vistaUsuario.CorreoUsuario,
-                TipoUsuario = vistaUsuario.TipoUsuario,
-                Area = vistaUsuario.Area,
-                PasswordUsuario = vistaUsuario.PasswordUsuario
 
-            };
+            Usuario modelo = _mapper.Map<Usuario>(updateUsuario);
             _db.Usuarios.Update(modelo);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpPatch("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult UpdatePartialUsuario(int id, JsonPatchDocument<VistaUsuario> patchDto)
+        public async Task<IActionResult> UpdatePartialUsuario(int id, JsonPatchDocument<UpdateUsuario> patchDto)
         {
             if (patchDto == null || id == 0)
-            { return BadRequest(); }
-            var usuario = _db.Usuarios.AsNoTracking().FirstOrDefault(v => v.IdUsuario == id);
-            VistaUsuario vistaUsuario = new()
-            {
-                IdUsuario = usuario.IdUsuario,
-                NombreUsuario = usuario.NombreUsuario,
-                CorreoUsuario = usuario.CorreoUsuario,
-                TipoUsuario = usuario.TipoUsuario,
-                Area = usuario.Area,
-                PasswordUsuario = usuario.PasswordUsuario
-            };
+            { 
+                return BadRequest(); 
+            
+           }
+            var usuario = await _db.Usuarios.AsNoTracking().FirstOrDefaultAsync(v => v.IdUsuario == id);
 
-            if (usuario == null) return BadRequest();
-            patchDto.ApplyTo(vistaUsuario, ModelState);
+            UpdateUsuario updateUsuario = _mapper.Map<UpdateUsuario>(usuario);
+
+            if (usuario == null)
+            { return BadRequest(); }
+            patchDto.ApplyTo(updateUsuario, ModelState);
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-            Usuario modelo = new()
-            {
-                IdUsuario = vistaUsuario.IdUsuario,
-                NombreUsuario = vistaUsuario.NombreUsuario,
-                CorreoUsuario = vistaUsuario.CorreoUsuario,
-                TipoUsuario = vistaUsuario.TipoUsuario,
-                Area = vistaUsuario.Area,
-                PasswordUsuario = vistaUsuario.PasswordUsuario
-
-            };
+            Usuario modelo = _mapper.Map<Usuario>(updateUsuario);
             _db.Usuarios.Update(modelo);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return NoContent();
         }
-
+    
     }
 }

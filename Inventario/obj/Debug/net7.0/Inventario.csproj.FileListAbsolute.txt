@@ -78,3 +78,5 @@ C:\inventario\Inventario\Inventario\obj\Debug\net7.0\refint\Inventario.dll
 C:\inventario\Inventario\Inventario\obj\Debug\net7.0\Inventario.pdb
 C:\inventario\Inventario\Inventario\obj\Debug\net7.0\Inventario.genruntimeconfig.cache
 C:\inventario\Inventario\Inventario\obj\Debug\net7.0\ref\Inventario.dll
+C:\inventario\Inventario\Inventario\bin\Debug\net7.0\AutoMapper.dll
+C:\inventario\Inventario\Inventario\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

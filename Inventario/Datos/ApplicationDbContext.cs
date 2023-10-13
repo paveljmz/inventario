@@ -10,6 +10,10 @@ namespace Inventario.Datos
 
         }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Productos> Productos { get; set; }
+        public DbSet<Area> Area { get; set; }
+        public DbSet<Rol> Rol { get; set; }
+        public DbSet<Categoria> Categoria { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,7 +24,8 @@ namespace Inventario.Datos
                 CorreoUsuario = "jpavel202@gmail.com",
                 TipoUsuario = "administrador",
                 PasswordUsuario = "pavel12345",
-                Area = "tics",
+                IdArea = "tics",
+                IdRol = "1",
                 FechaCreacion = DateTime.Now
 
             },
@@ -31,10 +36,14 @@ namespace Inventario.Datos
                 CorreoUsuario = "Alex@gmail.com",
                 TipoUsuario = "administrador",
                 PasswordUsuario = "alex123",
-                Area = "tics",
+                IdArea = "tics",
+                IdRol = "1",
                 FechaCreacion = DateTime.Now
 
             });
+            
+
+
         }
 
     }

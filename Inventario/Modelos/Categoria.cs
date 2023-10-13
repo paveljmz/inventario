@@ -3,11 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Inventario.Modelos
 {
-    public class Rol
+    public class Categoria
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] //sirve para poder incrementar de 1 en 1 el id  automaticamente 
-        public int IdRol { get; set; }
-        public string NombreRol { get; set; }
+        public int IdCategoria { get; set; }
+        [Required]
+        [StringLength(50)]  
+        public string NCategoria { get; set; }
     }
 }

@@ -10,8 +10,7 @@ namespace Inventario.Modelos
         public int IdArea { get; set; }
         public string NombreArea { get; set; }
         public string DireccionArea { get; set; }
-
-        public string Respónsable { get; set; }
+        public string Responsable { get; set; }
        
     }
 }

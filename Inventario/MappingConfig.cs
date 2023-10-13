@@ -13,6 +13,10 @@ namespace Inventario
 
             CreateMap<Usuario, CreateUsuario>().ReverseMap();
             CreateMap<Usuario, UpdateUsuario>().ReverseMap();
+
+            CreateMap<Productos, VistaProductos>().ReverseMap();
+            CreateMap<Productos, CreateProducto>().ReverseMap();
+            CreateMap<Productos, UpdateProducto>().ReverseMap();
         }
     }
 }

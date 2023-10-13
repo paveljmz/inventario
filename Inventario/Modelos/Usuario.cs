@@ -14,8 +14,8 @@ namespace Inventario.Modelos
        
         public string TipoUsuario { get; set; }
         public string PasswordUsuario { get; set; }
-        public string Area { get; set; }
-
+        public string IdArea { get; set; }
+        public string IdRol { get; set; }
         public DateTime FechaCreacion { get; set; }
 
     }

@@ -9,9 +9,8 @@ namespace Inventario.Modelos.Vistas
         [MaxLength(30)]
         public string NombreUsuario { get; set; }
         public string CorreoUsuario { get; set; }
-
         public string TipoUsuario { get; set; }
-        public string PasswordUsuario { get; set; }
-        public string Area { get; set; }
+        public string IdTipoProducto { get; set; }
+        public string IdCategoria { get; set; }
     }
 }

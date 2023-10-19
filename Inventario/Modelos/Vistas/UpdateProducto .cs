@@ -13,7 +13,7 @@ namespace Inventario.Modelos.Vistas
         public string Modelo { get; set; }
         public string NSerie { get; set; }
         public string Caracteristicas { get; set; }
-        public string IdTipoProducto { get; set; }
+        public int IdTProducto { get; set; }
         public string IdCategoria { get; set; }
     }
 }

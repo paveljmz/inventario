@@ -21,9 +21,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
-builder.Services.AddScoped<IProductosRepositorio, ProductosRepositorio>();
+builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IProductosRepositorio, ProductosRepositorio>();
+builder.Services.AddScoped<ITipoProductoRepositorio, TipoProductoRepositorio>();
+
+
+builder.Services.AddCors(options =>
+{
+    //NUEVA POLITICA
+    options.AddPolicy("NuevaPolitica", app =>
+    {
+        //PERMITE CUALQUIER ORIGEN
+        app.AllowAnyOrigin()
+        //PERMIE CUALQUIER CABECERA
+        .AllowAnyHeader()
+        //PERMITE CUALQUIER METODO
+        .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -32,8 +52,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+//app.UseHttpsRedirection();
+app.UseCors("NuevaPolitica");
 app.UseAuthorization();
 
 app.MapControllers();

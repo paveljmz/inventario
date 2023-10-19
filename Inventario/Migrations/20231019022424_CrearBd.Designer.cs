@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventario.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231004054455_TablasMigration")]
-    partial class TablasMigration
+    [Migration("20231019022424_CrearBd")]
+    partial class CrearBd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,6 +80,9 @@ namespace Inventario.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
@@ -87,9 +90,8 @@ namespace Inventario.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("IdTipoProducto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("IdTipoProducto")
+                        .HasColumnType("int");
 
                     b.Property<string>("Marca")
                         .IsRequired()
@@ -109,24 +111,47 @@ namespace Inventario.Migrations
 
                     b.HasKey("IdProducto");
 
+                    b.HasIndex("IdTipoProducto");
+
                     b.ToTable("Productos");
                 });
 
             modelBuilder.Entity("Inventario.Modelos.Rol", b =>
                 {
-                    b.Property<int>("IdUsuario")
+                    b.Property<int>("IdRol")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdUsuario"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
 
                     b.Property<string>("NombreRol")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdUsuario");
+                    b.HasKey("IdRol");
 
                     b.ToTable("Rol");
+                });
+
+            modelBuilder.Entity("Inventario.Modelos.TipoProducto", b =>
+                {
+                    b.Property<int>("IdTipoProducto")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NombreTipoProducto")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("IdTipoProducto");
+
+                    b.ToTable("TipoProducto");
                 });
 
             modelBuilder.Entity("Inventario.Modelos.Usuario", b =>
@@ -137,16 +162,20 @@ namespace Inventario.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdUsuario"));
 
-                    b.Property<string>("Area")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CorreoUsuario")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("IdArea")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdRol")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreUsuario")
                         .IsRequired()
@@ -163,28 +192,17 @@ namespace Inventario.Migrations
                     b.HasKey("IdUsuario");
 
                     b.ToTable("Usuarios");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            IdUsuario = 1,
-                            Area = "tics",
-                            CorreoUsuario = "jpavel202@gmail.com",
-                            FechaCreacion = new DateTime(2023, 10, 3, 23, 44, 55, 449, DateTimeKind.Local).AddTicks(4970),
-                            NombreUsuario = "Pavel",
-                            PasswordUsuario = "pavel12345",
-                            TipoUsuario = "administrador"
-                        },
-                        new
-                        {
-                            IdUsuario = 2,
-                            Area = "tics",
-                            CorreoUsuario = "Alex@gmail.com",
-                            FechaCreacion = new DateTime(2023, 10, 3, 23, 44, 55, 449, DateTimeKind.Local).AddTicks(4984),
-                            NombreUsuario = "Alejandro",
-                            PasswordUsuario = "alex123",
-                            TipoUsuario = "administrador"
-                        });
+            modelBuilder.Entity("Inventario.Modelos.Productos", b =>
+                {
+                    b.HasOne("Inventario.Modelos.TipoProducto", "TipoProducto")
+                        .WithMany()
+                        .HasForeignKey("IdTipoProducto")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TipoProducto");
                 });
 #pragma warning restore 612, 618
         }

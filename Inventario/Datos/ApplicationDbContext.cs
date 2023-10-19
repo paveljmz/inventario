@@ -11,40 +11,41 @@ namespace Inventario.Datos
         }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Productos> Productos { get; set; }
+        public DbSet<TipoProducto> TipoProducto { get; set; }
         public DbSet<Area> Area { get; set; }
         public DbSet<Rol> Rol { get; set; }
         public DbSet<Categoria> Categoria { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Usuario>().HasData(new Usuario()
-            {
-                IdUsuario = 1,
-                NombreUsuario = "Pavel",
-                CorreoUsuario = "jpavel202@gmail.com",
-                TipoUsuario = "administrador",
-                PasswordUsuario = "pavel12345",
-                IdArea = "tics",
-                IdRol = "1",
-                FechaCreacion = DateTime.Now
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Usuario>().HasData(new Usuario()
+        //    {
+        //        IdUsuario = 1,
+        //        NombreUsuario = "Pavel",
+        //        CorreoUsuario = "jpavel202@gmail.com",
+        //        TipoUsuario = "administrador",
+        //        PasswordUsuario = "pavel12345",
+        //        IdArea = "tics",
+        //        IdRol = "1",
+        //        FechaCreacion = DateTime.Now
 
-            },
-            new Usuario()
-            {
-                IdUsuario = 2,
-                NombreUsuario = "Alejandro",
-                CorreoUsuario = "Alex@gmail.com",
-                TipoUsuario = "administrador",
-                PasswordUsuario = "alex123",
-                IdArea = "tics",
-                IdRol = "1",
-                FechaCreacion = DateTime.Now
+        //    },
+        //    new Usuario()
+        //    {
+        //        IdUsuario = 2,
+        //        NombreUsuario = "Alejandro",
+        //        CorreoUsuario = "Alex@gmail.com",
+        //        TipoUsuario = "administrador",
+        //        PasswordUsuario = "alex123",
+        //        IdArea = "tics",
+        //        IdRol = "1",
+        //        FechaCreacion = DateTime.Now
 
-            });
+        //    });
             
 
 
-        }
+        //}
 
     }
 }

@@ -17,6 +17,10 @@ namespace Inventario
             CreateMap<Productos, VistaProductos>().ReverseMap();
             CreateMap<Productos, CreateProducto>().ReverseMap();
             CreateMap<Productos, UpdateProducto>().ReverseMap();
+
+            CreateMap<TipoProducto, VistaTipoProducto>().ReverseMap();
+            CreateMap<TipoProducto, CreateTipoProducto>().ReverseMap();
+            CreateMap<TipoProducto, UpdateTipoProducto>().ReverseMap();
         }
     }
 }

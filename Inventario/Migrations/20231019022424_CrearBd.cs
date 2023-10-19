@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Inventario.Migrations
 {
     /// <inheritdoc />
-    public partial class TablasMigration : Migration
+    public partial class CrearBd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -42,37 +40,30 @@ namespace Inventario.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Productos",
-                columns: table => new
-                {
-                    IdProducto = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NombreProducto = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Marca = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Modelo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NSerie = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Caracteristicas = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IdTipoProducto = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IdCategoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
-                   
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Productos", x => x.IdProducto);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Rol",
                 columns: table => new
                 {
-                    IdUsuario = table.Column<int>(type: "int", nullable: false)
+                    IdRol = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NombreRol = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rol", x => x.IdUsuario);
+                    table.PrimaryKey("PK_Rol", x => x.IdRol);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TipoProducto",
+                columns: table => new
+                {
+                    IdTipoProducto = table.Column<int>(type: "int", nullable: false),
+                    NombreTipoProducto = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaActualizacion = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TipoProducto", x => x.IdTipoProducto);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,7 +76,8 @@ namespace Inventario.Migrations
                     CorreoUsuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TipoUsuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PasswordUsuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Area = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IdArea = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IdRol = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -93,14 +85,37 @@ namespace Inventario.Migrations
                     table.PrimaryKey("PK_Usuarios", x => x.IdUsuario);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Usuarios",
-                columns: new[] { "IdUsuario", "Area", "CorreoUsuario", "FechaCreacion", "NombreUsuario", "PasswordUsuario", "TipoUsuario" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "Productos",
+                columns: table => new
                 {
-                    { 1, "tics", "jpavel202@gmail.com", new DateTime(2023, 10, 3, 23, 44, 55, 449, DateTimeKind.Local).AddTicks(4970), "Pavel", "pavel12345", "administrador" },
-                    { 2, "tics", "Alex@gmail.com", new DateTime(2023, 10, 3, 23, 44, 55, 449, DateTimeKind.Local).AddTicks(4984), "Alejandro", "alex123", "administrador" }
+                    IdProducto = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NombreProducto = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Marca = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Modelo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NSerie = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Caracteristicas = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IdTipoProducto = table.Column<int>(type: "int", nullable: false),
+                    IdCategoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaActualizacion = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Productos", x => x.IdProducto);
+                    table.ForeignKey(
+                        name: "FK_Productos_TipoProducto_IdTipoProducto",
+                        column: x => x.IdTipoProducto,
+                        principalTable: "TipoProducto",
+                        principalColumn: "IdTipoProducto",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Productos_IdTipoProducto",
+                table: "Productos",
+                column: "IdTipoProducto");
         }
 
         /// <inheritdoc />
@@ -120,6 +135,9 @@ namespace Inventario.Migrations
 
             migrationBuilder.DropTable(
                 name: "Usuarios");
+
+            migrationBuilder.DropTable(
+                name: "TipoProducto");
         }
     }
 }

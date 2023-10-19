@@ -13,18 +13,17 @@ namespace Inventario.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductosController : ControllerBase
+    public class TipoProductoController : ControllerBase
     {
-        private readonly ILogger<ProductosController> _logger;
-        private readonly IProductosRepositorio _productosRepo;
+        private readonly ILogger<TipoProductoController> _logger;
+        //private readonly IProductosRepositorio _productosRepo;
         private readonly ITipoProductoRepositorio _tipoProductoRepo;
         private readonly IMapper _mapper;
         protected APIResponse _response;
-        public ProductosController(ILogger<ProductosController> logger, IProductosRepositorio productosRepo,
-                                                  ITipoProductoRepositorio tipoProductoRepo, IMapper mapper)
+        public TipoProductoController(ILogger<TipoProductoController> logger,ITipoProductoRepositorio tipoProductoRepo ,IMapper mapper)
         {
             _logger = logger;
-            _productosRepo = productosRepo;
+        //    _productosRepo = productosRepo; 
             _tipoProductoRepo = tipoProductoRepo;
             _mapper = mapper;
             _response = new();
@@ -34,13 +33,13 @@ namespace Inventario.Controllers
         [HttpGet]
         [Route("Lista")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> Lista()
+        public async Task<ActionResult<APIResponse>> ListaTP()
         {
             try
             {
-                _logger.LogInformation("obtener los productos");
-                IEnumerable<Productos> productosList = await _productosRepo.ObtenerTodos();
-                _response.Resultado = _mapper.Map<IEnumerable<VistaProductos>>(productosList);
+                _logger.LogInformation("obtener los tipos de  productos");
+                IEnumerable<TipoProducto> tipoProductoList = await _tipoProductoRepo.ObtenerTodos();
+                _response.Resultado = _mapper.Map<IEnumerable<VistaTipoProducto>>(tipoProductoList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -54,31 +53,31 @@ namespace Inventario.Controllers
         }
 
         [HttpGet]
-        [Route("Lista2/{id:int}, Name =GetProductos")]
+        [Route("Lista2/{id:int}", Name = "GetProductos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> Lista(int id)
+        public async Task<ActionResult<APIResponse>> ListaTP(int id)
         {
             try
             {
                 if (id == 0)
                 {
-                    _logger.LogError("error al obtener el producto " + id);
+                    _logger.LogError("error al obtener el tipo de  producto " + id);
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     _response.IsExitoso = false;
                     return BadRequest();
 
                 }
-                
-                var producto = await _productosRepo.Obtener(v => v.IdProducto == id);
+              
+                var tipoProducto = await _tipoProductoRepo.Obtener(v => v.IdTipoProducto == id);
 
-                if (producto == null)
+                if (tipoProducto == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
-                _response.Resultado = _mapper.Map<VistaProductos>(producto);
+                _response.Resultado = _mapper.Map<VistaTipoProducto>(tipoProducto);
                 _response.IsExitoso = false;
                 return Ok(_response);
 
@@ -98,7 +97,7 @@ namespace Inventario.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public async Task<ActionResult<APIResponse>> Guardar([FromBody] CreateProducto createProducto)
+        public async Task<ActionResult<APIResponse>> GuardarTP([FromBody] CreateTipoProducto createTProducto)
         {
             try
             {
@@ -106,24 +105,21 @@ namespace Inventario.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-
-                if (await _tipoProductoRepo.Obtener(v => v.IdTipoProducto == createProducto.IdTProducto) == null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
+                if (await _tipoProductoRepo.Obtener(v => v.NombreTipoProducto.ToLower() == createTProducto.NombreTipoProducto.ToLower()) != null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
                 {
-                    ModelState.AddModelError("CLAVE FORANEA", " NO EXISTE UN TIPO DE PRODUCTO CON ESE ID");
+                    ModelState.AddModelError("EL NOMBRE YA EXISTE", " UN TIPO DE PRODUCTO  CON ESE NOMBRE YA EXISTE");
                     return BadRequest(ModelState);
                 }
-                if (createProducto == null)
+                if (createTProducto == null)
                 {
-                    return BadRequest(createProducto);
+                    return BadRequest(createTProducto);
                 }
-                Productos modelo = _mapper.Map<Productos>(createProducto);
-                modelo.FechaCreacion = DateTime.Now;
-                modelo.FechaActualizacion = DateTime.Now;
-                await _productosRepo.Crear(modelo);//insert en bd
+                TipoProducto modelo = _mapper.Map<TipoProducto>(createTProducto);
+                await _tipoProductoRepo.Crear(modelo);//insert en bd
                 _response.Resultado = modelo;
                 _response.StatusCode = HttpStatusCode.Created;
 
-                return CreatedAtRoute("GetProductos", new { id = modelo.IdProducto }, _response);
+                return CreatedAtRoute("GetProductos", new { id = modelo.IdTipoProducto }, _response);
             }
             catch (Exception ex)
             {
@@ -139,7 +135,7 @@ namespace Inventario.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> EliminarTP(int id)
         {
             try
             {
@@ -149,15 +145,15 @@ namespace Inventario.Controllers
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var producto = await _productosRepo.Obtener(v => v.IdProducto == id);
-                if (producto == null)
+                var tProducto = await _tipoProductoRepo.Obtener(v => v.IdTipoProducto == id);
+                if (tProducto == null)
                 {
                     _response.IsExitoso = false;
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
 
-                await _productosRepo.Remover(producto);
+                await _tipoProductoRepo.Remover(tProducto);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 return Ok(_response);
 
@@ -175,24 +171,24 @@ namespace Inventario.Controllers
         [Route("Editar/{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Editar(int id, [FromBody] UpdateProducto updateProducto)
+        public async Task<IActionResult> EditarTP(int id, [FromBody] UpdateTipoProducto updateTProducto)
         {
             try
             {
-                if (updateProducto == null || id != updateProducto.IdProducto)
+                if (updateTProducto == null || id != updateTProducto.IdTipoProducto)
                     
                 {
                     _response.IsExitoso = false;
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                if (await _tipoProductoRepo.Obtener(v => v.IdTipoProducto == updateProducto.IdTProducto) == null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
-                {
-                    ModelState.AddModelError("CLAVE FORANEA", " NO EXISTE UN TIPO DE PRODUCTO CON ESE ID");
-                    return BadRequest(ModelState);
-                }
-                Productos modelo = _mapper.Map<Productos>(updateProducto);
-                await _productosRepo.Actualizar(modelo);
+                //if (await _productosRepo.Obtener(v => v.IdProducto == updateProducto.IdTipoProducto) == null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
+                //{
+                //    ModelState.AddModelError("CLAVE FORANEA", " NO EXISTE UN PRODUCTO CON ESE ID");
+                //    return BadRequest(ModelState);
+                //}
+                TipoProducto modelo = _mapper.Map<TipoProducto>(updateTProducto);
+                await _tipoProductoRepo.Actualizar(modelo);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 return Ok(_response);
 
@@ -207,47 +203,6 @@ namespace Inventario.Controllers
 
         }
 
-        [HttpPatch]
-        [Route("Editar2/{id:int}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Editar2(int id, JsonPatchDocument<UpdateProducto> patchDto)
-        {
-            if (patchDto == null || id == 0)
-            {
-                return BadRequest();
-
-            }
-            var producto = await _productosRepo.Obtener(v => v.IdProducto == id, tracked: false);
-
-            UpdateProducto updateProducto = _mapper.Map<UpdateProducto>(producto);
-
-            try
-            {
-                if (producto == null)
-                { return BadRequest(); }
-                patchDto.ApplyTo(updateProducto, ModelState);
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                if (await _tipoProductoRepo.Obtener(v => v.IdTipoProducto == updateProducto.IdTProducto) == null) //este if es pára evitar la repeticion de articulos o personas con el mismo nombre o para que algunn dato ya ingresado no se repita
-                {
-                    ModelState.AddModelError("CLAVE FORANEA", " NO EXISTE UN TIPO DE PRODUCTO CON ESE ID");
-                    return BadRequest(ModelState);
-                }
-                Productos modelo = _mapper.Map<Productos>(updateProducto);
-                await _productosRepo.Actualizar(modelo);
-                _response.StatusCode = HttpStatusCode.NoContent;
-                return Ok(_response);
-            }
-            catch (Exception ex )
-            {
-                _response.IsExitoso = false;
-                _response.ErrorMessages = new List<string>() { ex.ToString() };
-                return BadRequest(_response);
-            }
-
-        }
+       
     }
 }

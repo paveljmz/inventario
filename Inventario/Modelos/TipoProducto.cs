@@ -6,11 +6,12 @@ namespace Inventario.Modelos
     public class TipoProducto
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] //sirve para poder incrementar de 1 en 1 el id  automaticamente 
-        public int IdTipoProducto { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)] 
+        public int IdTipoProducto { get; set; }  
         [Required]
         [StringLength(50)]
-        public string NTipoProducto { get; set; }
-
+        public string NombreTipoProducto { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public DateTime FechaActualizacion { get; set; }
     }
 }
